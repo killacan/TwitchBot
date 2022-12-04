@@ -1,0 +1,23 @@
+{
+  "name": "first-twitch-bot",
+  "version": "1.0.0",
+  "description": "first attempt at a twitch bot",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/killacan/TwitchBot.git"
+  },
+  "author": "Cameron Sands",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/killacan/TwitchBot/issues"
+  },
+  "homepage": "https://github.com/killacan/TwitchBot#readme",
+  "dependencies": {
+    "tmi.js": "^1.8.5"
+  }
+}
