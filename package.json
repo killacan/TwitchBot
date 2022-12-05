@@ -18,6 +18,8 @@
   },
   "homepage": "https://github.com/killacan/TwitchBot#readme",
   "dependencies": {
+    "brain.js": "^2.0.0-beta.17",
+    "node-nlp": "^4.24.0",
     "tmi.js": "^1.8.5"
   }
 }

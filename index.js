@@ -1,4 +1,5 @@
 const TMI = require('tmi.js');
+const Brain = require('brain.js');
 
 const BOT_NAME = "LlamaBot";
 const TMI_OAUTH = "oauth:r6dxrdv90812ced9gy0w8b6dtti12e"
@@ -12,12 +13,19 @@ const TMI_OPTIONS = {
     ]
 }
 
+const net = new brain.NeuralNetwork();
+
+net.train([
+    
+])
+
 const client = new TMI.client(TMI_OPTIONS);
 client.on("connected", onConnectionHandler);
 client.connect();
 client.on("message", onMessageHandler);
 
-var quotes = [];
+let quotes = [];
+let channelPoints = {};
 
 function addQuote (quote) {
     quotes.push(quote);
@@ -81,6 +89,12 @@ function onMessageHandler(target, context, msg, self) {
         console.log(quotes, "I am in the response");
         let response = getRandomQuote();
         client.say(target, `${response}`);
+    } else if (trimmedMsg === '!points') {
+        if (channelPoints[context.username]) {
+            client.say(target, `${context.username} has ${channelPoints[context.username]} points!`);
+        } else {
+            client.say(target, `${context.username} has 0 points!`);
+        }
     }
 }
 
