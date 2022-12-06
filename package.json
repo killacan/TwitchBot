@@ -18,7 +18,12 @@
   },
   "homepage": "https://github.com/killacan/TwitchBot#readme",
   "dependencies": {
+    "@nlpjs/basic": "^4.23.5",
+    "@nlpjs/directline-connector": "^4.23.4",
+    "@nlpjs/express-api-server": "^4.23.4",
     "brain.js": "^2.0.0-beta.17",
+    "express-api-server": "^0.0.8",
+    "natural": "^5.2.4",
     "node-nlp": "^4.24.0",
     "tmi.js": "^1.8.5"
   }

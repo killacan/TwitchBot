@@ -1,5 +1,23 @@
 const TMI = require('tmi.js');
-const Brain = require('brain.js');
+// const { dockStart } = require('@nlpjs/basic');
+// let chatBot = {};
+
+// (async () => {
+//     console.log("async function called");
+//     const dock = await dockStart();
+//     const nlp = dock.get('nlp');
+//     chatBot = await nlp.train();
+//     console.log(nlp.process('en', 'Hello world!'));
+// })();
+// // training(); // Start the training
+
+const natural = require('natural');
+const tokenizer = new natural.WordTokenizer();
+const Analyzer = require('natural').SentimentAnalyzer;
+const stemmer = require('natural').PorterStemmer;
+const analyzer = new Analyzer("English", stemmer, "afinn");
+
+const brain = require('brain.js');
 
 const BOT_NAME = "LlamaBot";
 const TMI_OAUTH = "oauth:r6dxrdv90812ced9gy0w8b6dtti12e"
@@ -12,12 +30,6 @@ const TMI_OPTIONS = {
         "leisurellama"
     ]
 }
-
-const net = new brain.NeuralNetwork();
-
-net.train([
-    
-])
 
 const client = new TMI.client(TMI_OPTIONS);
 client.on("connected", onConnectionHandler);
@@ -33,6 +45,29 @@ function addQuote (quote) {
 
 function getRandomQuote() {
     return quotes[Math.floor(Math.random() * quotes.length)];
+}
+
+const trainingData = [
+    { input: "hello", output: "Hello!" },
+    { input: "how are you", output: "I'm fine, thanks!" },
+    { input: "what your name", output: "My name is LlamaBot!" },
+    { input: "what your favorite color", output: "My favorite color is blue!" },
+]
+
+const net = new brain.recurrent.LSTM();
+net.train(trainingData, {
+    iterations: 1000,
+    errorThresh: 0.011
+});
+
+const botMessage = async (target, message) => {
+    // const response = await chatBot.process('en', message);
+    // client.say(target, response);
+    // console.log(analyzer.getSentiment(tokenizer.tokenize(message)));
+    // console.log(net.run(message), "this is the bot message");
+    result = tokenizer.tokenize(message).join(" ");
+    console.log(result, "this is the result");
+    client.say(target, net.run(result));
 }
 
 function onMessageHandler(target, context, msg, self) {
@@ -94,6 +129,22 @@ function onMessageHandler(target, context, msg, self) {
             client.say(target, `${context.username} has ${channelPoints[context.username]} points!`);
         } else {
             client.say(target, `${context.username} has 0 points!`);
+        }
+    } else if (splitMsg[0] === '!bot') {
+        botMessage(target, splitMsg.slice(1).join(" "));
+    }
+    
+    if (msg) {
+        let message = splitMsg.slice(1).join(" ");
+        // botMessage(target, message);
+        sentiment = analyzer.getSentiment(tokenizer.tokenize(message));
+        console.log(analyzer.getSentiment(tokenizer.tokenize(message)));
+        if (sentiment <= -.5) {
+            let response = funnyResponses[Math.floor(Math.random() * funnyResponses.length)];
+            client.say(target, `${response}`);
+        } else if (sentiment >= .75) {
+            let response = encouragingResponse[Math.floor(Math.random() * encouragingResponse.length)];
+            client.say(target, `${response}`);
         }
     }
 }
