@@ -19,7 +19,7 @@ const analyzer = new Analyzer("English", stemmer, "afinn");
 
 const brain = require('brain.js');
 
-const BOT_NAME = "LlamaBot";
+const BOT_NAME = "llamachop_bot";
 const TMI_OAUTH = "oauth:r6dxrdv90812ced9gy0w8b6dtti12e"
 const TMI_OPTIONS = {
     identity: {
@@ -50,8 +50,10 @@ function getRandomQuote() {
 const trainingData = [
     { input: "hello", output: "Hello!" },
     { input: "how are you", output: "I'm fine, thanks!" },
-    { input: "what your name", output: "My name is LlamaBot!" },
+    { input: "what your name", output: "My name is llamachop_bot!" },
     { input: "what your favorite color", output: "My favorite color is blue!" },
+    { input: "goodbye", output: "Goodbye!" },
+    { input: "tell me a joke", output: "What do you call a cow with no legs? Ground beef!" },
 ]
 
 const net = new brain.recurrent.LSTM();
@@ -60,14 +62,20 @@ net.train(trainingData, {
     errorThresh: 0.011
 });
 
-const botMessage = async (target, message) => {
+const botMessage = async (target, message, jokes) => {
     // const response = await chatBot.process('en', message);
     // client.say(target, response);
     // console.log(analyzer.getSentiment(tokenizer.tokenize(message)));
     // console.log(net.run(message), "this is the bot message");
     result = tokenizer.tokenize(message).join(" ");
-    console.log(result, "this is the result");
-    client.say(target, net.run(result));
+    console.log(net.run(result), "this is the result");
+    console.log(net.run(result) === "", "this is the boolean");
+    if (net.run(result).includes("cow")) {
+        result = jokes[Math.floor(Math.random() * jokes.length)];
+        client.say(target, result);
+    } else {
+        client.say(target, net.run(result));
+    }
 }
 
 function onMessageHandler(target, context, msg, self) {
@@ -104,6 +112,15 @@ function onMessageHandler(target, context, msg, self) {
         "Keep up the good vibes and don't let anyone bring you down. You are amazing and you can do anything you set your mind to!",
     ]
 
+    let jokes = [  "Why couldn't the bicycle stand up by itself? Because it was two-tired.",  
+        "Why did the tomato turn red? Because it saw the salad dressing.",  
+        "Why did the scarecrow win an award? Because he was outstanding in his field.",  
+        "Why was the math book sad? Because it had too many problems.",  
+        "Why did the belt go to jail? Because it held up a pair of pants.",  
+        "Why was the belt fined? Because it was caught with a belt buckle.",  
+        "Why was the belt arrested? Because it was holding up a pair of pants."
+    ];
+
     console.log(target, context.username, msg, trimmedMsg)
 
     if (trimmedMsg === "!hello") {
@@ -131,7 +148,7 @@ function onMessageHandler(target, context, msg, self) {
             client.say(target, `${context.username} has 0 points!`);
         }
     } else if (splitMsg[0] === '!bot') {
-        botMessage(target, splitMsg.slice(1).join(" "));
+        botMessage(target, splitMsg.slice(1).join(" "), jokes);
     }
     
     if (msg) {
