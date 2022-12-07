@@ -211,7 +211,7 @@ function onConnectionHandler(addr, port) {
     console.log(`* Connected to ${addr}:${port}`);
     
     setInterval(() => {
-        console.log("interval")
+        // console.log("interval")
         TMI_OPTIONS.channels.forEach(channel => {
             client.say(channel, "llamachop_bot here, say !funny for an insult, !encourage for words of encouragement. I use machine learning to detect mood of messages! Exceptionally positive messages are rewarded and negative messages give an insult. !bot to ask me questions like what is my favorite song, or who am I." )
         })

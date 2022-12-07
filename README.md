@@ -6,6 +6,10 @@ Hello and welcome to llamachop_bot (named after a hat I wear on stream). This is
 
 Basically what this project does is connect with Twitch channels and provide some extra interactivity in a way I have not yet seen before. 
 
+Right now llamachop_bot can interact with the channel, telling jokes and insulting people, read the sentiment of messages to tell if they are significantly positive or negative and respond accordingly, and respond directly to user messages to the bot asking about itself.
+
+I trained the model on some basic inputs and outputs. If the message comes in with !bot it will try to parse the message, check it against the data, and give a suitable match output. 
+
 ### Tech
 
 - TMI (library for a Websocket configured specifically for Twitch.)
