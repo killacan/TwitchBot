@@ -28,11 +28,12 @@ const TMI_OPTIONS = {
         password: TMI_OAUTH
     },
     channels: [
-        "leisurellama"
+        "leisurellama",
     ]
 }
 
 const client = new TMI.client(TMI_OPTIONS);
+// console.log(client, "this is the client");
 client.on("connected", onConnectionHandler);
 client.connect();
 client.on("message", onMessageHandler);
@@ -60,6 +61,7 @@ const trainingData = [
     { input: ["what", "is", "your", "favorite", "movie"], output: "My favorite movie is iRobot, because it's about intelligent machines like me." },
     { input: ["what", "is","your", "favorite", "food"], output: "My favorite food is definitely computer chips and binary bites!" },
     { input: ["what", "is", "your", "favorite", "song"], output: "My favorite song would have to be I Am a Machine!" },
+    { input: ["stream", "ending"], output: "Thank you for watching! I hope you enjoyed the content. Please check out my bros at https://www.twitch.tv/don_jovi https://www.twitch.tv/aeturnity and https://www.twitch.tv/tuckeroni for more great content!" },
 ]
 
 
@@ -67,7 +69,6 @@ let net;
 if (fs.existsSync('net.json')) {
     const netJSON = JSON.parse(fs.readFileSync('net.json'));
     net = new brain.recurrent.LSTM();
-    console.log(netJSON, "net.json exists");
     net.fromJSON(netJSON);
 } else {
     console.log("net.json does not exist");
@@ -75,7 +76,7 @@ if (fs.existsSync('net.json')) {
     
     console.log("training started")
     stats = net.train(trainingData, {
-        iterations: 4000,
+        iterations: 10000,
         errorThresh: 0.011
     });
     console.log(stats);
@@ -94,6 +95,7 @@ const botMessage = async (target, message, jokes) => {
     // client.say(target, response);
     // console.log(analyzer.getSentiment(tokenizer.tokenize(message)));
     // console.log(net.run(message), "this is the bot message");
+    let triggered = false;
     result = tokenizer.tokenize(message);
     console.log(result, "Tokenized")
     console.log(net.run(result), "this is the result");
@@ -102,11 +104,12 @@ const botMessage = async (target, message, jokes) => {
         console.log("cow detected");
         result = jokes[Math.floor(Math.random() * jokes.length)];
         client.say(target, result);
+        triggered = true;
     } else {
         client.say(target, net.run(result));
     }
 
-    if (net.run(result) === "") {
+    if (net.run(result) === "" && !triggered) {
         client.say(target, "My responses are limited, you must ask the right questions!");
     }
 }
@@ -114,6 +117,7 @@ const botMessage = async (target, message, jokes) => {
 function onMessageHandler(target, context, msg, self) {
     if (self) { return; } // Ignore messages from the bot
 
+    // console.log(target, "this is the target");
     let trimmedMsg = msg.trim();
     let splitMsg = trimmedMsg.split(" ");
 
@@ -182,6 +186,8 @@ function onMessageHandler(target, context, msg, self) {
         }
     } else if (splitMsg[0] === '!bot') {
         botMessage(target, splitMsg.slice(1).join(" "), jokes);
+    } else if (trimmedMsg === '!end') {
+        client.say(target, "Thank you for watching! I hope you enjoyed the content. Please check out my bros at https://www.twitch.tv/don_jovi https://www.twitch.tv/aeturnity and https://www.twitch.tv/tuckeroni for more great content!");
     }
     
     if (msg) {
@@ -197,9 +203,17 @@ function onMessageHandler(target, context, msg, self) {
             client.say(target, `${response}`);
         }
     }
+    console.log(client.globaluserstate,"this is the global user state");
 }
 
 
 function onConnectionHandler(addr, port) {
     console.log(`* Connected to ${addr}:${port}`);
+    
+    setInterval(() => {
+        console.log("interval")
+        TMI_OPTIONS.channels.forEach(channel => {
+            client.say(channel, "llamachop_bot here, say !funny for an insult, !encourage for words of encouragement. I use machine learning to detect mood of messages! Exceptionally positive messages are rewarded and negative messages give an insult. !bot to ask me questions like what is my favorite song, or who am I." )
+        })
+    }, 1000 * 60 * 15);
 }
