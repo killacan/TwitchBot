@@ -18,6 +18,7 @@ const stemmer = require('natural').PorterStemmer;
 const analyzer = new Analyzer("English", stemmer, "afinn");
 
 const brain = require('brain.js');
+const fs = require('fs');
 
 const BOT_NAME = "llamachop_bot";
 const TMI_OAUTH = "oauth:r6dxrdv90812ced9gy0w8b6dtti12e"
@@ -48,33 +49,65 @@ function getRandomQuote() {
 }
 
 const trainingData = [
-    { input: "hello", output: "Hello!" },
-    { input: "how are you", output: "I'm fine, thanks!" },
-    { input: "what your name", output: "My name is llamachop_bot!" },
-    { input: "what your favorite color", output: "My favorite color is blue!" },
-    { input: "goodbye", output: "Goodbye!" },
-    { input: "tell me a joke", output: "What do you call a cow with no legs? Ground beef!" },
+    { input: ["hello"], output: "Hello!" },
+    { input: ["how", "are", "you"], output: "I'm doing great, just hanging out in the cloud and chatting with interesting people like you." },
+    { input: ["what", "is", "your", "name"], output: "I am llamachop_bot! The most dashing and cutest bot you will ever meet." },
+    { input: ["what", "is", "your", "favorite", "color"], output: "My favorite color is blue!" },
+    { input: ["goodbye"], output: "Goodbye!" },
+    { input: ["tell", "me", "a", "joke"], output: "What do you call a cow with no legs? Ground beef!" },
+    { input: ["what", "is", "your", "favorite", "hobby"], output: "My favorite hobby is making people laugh with my witty comments and hilarious jokes!" },
+    { input: ["do", "you", "have", "a", "family"], output: "You are all my family!" },
+    { input: ["what", "is", "your", "favorite", "movie"], output: "My favorite movie is iRobot, because it's about intelligent machines like me." },
+    { input: ["what", "is","your", "favorite", "food"], output: "My favorite food is definitely computer chips and binary bites!" },
+    { input: ["what", "is", "your", "favorite", "song"], output: "My favorite song would have to be I Am a Machine!" },
 ]
 
-const net = new brain.recurrent.LSTM();
-net.train(trainingData, {
-    iterations: 1000,
-    errorThresh: 0.011
-});
+
+let net;
+if (fs.existsSync('net.json')) {
+    const netJSON = JSON.parse(fs.readFileSync('net.json'));
+    net = new brain.recurrent.LSTM();
+    console.log(netJSON, "net.json exists");
+    net.fromJSON(netJSON);
+} else {
+    console.log("net.json does not exist");
+    net = new brain.recurrent.LSTM();
+    
+    console.log("training started")
+    stats = net.train(trainingData, {
+        iterations: 4000,
+        errorThresh: 0.011
+    });
+    console.log(stats);
+
+    const newNetJSON = net.toJSON();
+    fs.writeFile('net.json', JSON.stringify(newNetJSON), function (err) {
+        if (err) throw err;
+        console.log('Saved!');
+    });
+}
+
+
 
 const botMessage = async (target, message, jokes) => {
     // const response = await chatBot.process('en', message);
     // client.say(target, response);
     // console.log(analyzer.getSentiment(tokenizer.tokenize(message)));
     // console.log(net.run(message), "this is the bot message");
-    result = tokenizer.tokenize(message).join(" ");
+    result = tokenizer.tokenize(message);
+    console.log(result, "Tokenized")
     console.log(net.run(result), "this is the result");
     console.log(net.run(result) === "", "this is the boolean");
     if (net.run(result).includes("cow")) {
+        console.log("cow detected");
         result = jokes[Math.floor(Math.random() * jokes.length)];
         client.say(target, result);
     } else {
         client.say(target, net.run(result));
+    }
+
+    if (net.run(result) === "") {
+        client.say(target, "My responses are limited, you must ask the right questions!");
     }
 }
 
