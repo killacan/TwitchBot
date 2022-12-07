@@ -15,4 +15,4 @@ Basically what this project does is connect with Twitch channels and provide som
 
 ### Next Steps
 
-I think the next steps for this project are going to make it more modular, allow for more user input, make a frontend and get it hosted somewhere.
+I think the next steps for this project are going to make it more modular, allow for more user input, make a frontend, and get it hosted somewhere.
