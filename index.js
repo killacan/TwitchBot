@@ -64,20 +64,21 @@ const trainingData = [
     { input: ["stream", "ending"], output: "Thank you for watching! I hope you enjoyed the content. Please check out my bros at https://www.twitch.tv/don_jovi https://www.twitch.tv/aeturnity and https://www.twitch.tv/tuckeroni for more great content!" },
 ]
 
+const importedTrainingData = JSON.parse(fs.readFileSync('trainingData.json'));
 
 let net;
-if (fs.existsSync('net.json')) {
-    const netJSON = JSON.parse(fs.readFileSync('net.json'));
-    net = new brain.recurrent.LSTM();
-    net.fromJSON(netJSON);
-} else {
+// if (fs.existsSync('net.json')) {
+//     const netJSON = JSON.parse(fs.readFileSync('net.json'));
+//     net = new brain.recurrent.LSTM();
+//     net.fromJSON(netJSON);
+// } else {
     console.log("net.json does not exist");
     net = new brain.recurrent.LSTM();
     
     console.log("training started")
-    stats = net.train(trainingData, {
-        iterations: 10000,
-        errorThresh: 0.011
+    stats = net.train(importedTrainingData, {
+        iterations: 40000,
+        errorThresh: 0.01
     });
     console.log(stats);
 
@@ -86,7 +87,7 @@ if (fs.existsSync('net.json')) {
         if (err) throw err;
         console.log('Saved!');
     });
-}
+// }
 
 
 
