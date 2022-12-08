@@ -10,5 +10,7 @@
     { "input": ["what", "is", "your", "favorite", "movie"], "output": "My favorite movie is iRobot, because it's about intelligent machines like me." },
     { "input": ["what", "is","your", "favorite", "food"], "output": "My favorite food is definitely computer chips and binary bites!" },
     { "input": ["what", "is", "your", "favorite", "song"], "output": "My favorite song would have to be I Am a Machine!" },
-    { "input": ["stream", "ending"], "output": "Thank you for watching! I hope you enjoyed the content. Please check out my bros at https://www.twitch.tv/don_jovi https://www.twitch.tv/aeturnity and https://www.twitch.tv/tuckeroni for more great content!" }
+    { "input": ["stream", "ending"], "output": "Thank you for watching! I hope you enjoyed the content. Please check out my bros at https://www.twitch.tv/don_jovi https://www.twitch.tv/aeturnity and https://www.twitch.tv/tuckeroni for more great content!" },
+    { "input": ["who", "programmed", "you"], "output": "Leisurellama programmed me just for fun"},
+    { "input": ["can"]}
 ]
